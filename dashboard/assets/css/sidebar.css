@@ -1,0 +1,63 @@
+/* Sidebar container */
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background: #1f2937; /* dark gray */
+    color: #fff;
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding: 20px 15px;
+}
+
+
+/* Brand */
+.sidebar-brand {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f97316; /* orange */
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Links */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    color: #cbd5e1;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-size: 15px;
+}
+
+/* Icons */
+.sidebar-link i {
+    width: 18px;
+}
+
+/* Hover */
+.sidebar-link:hover {
+    background: #374151;
+    color: #fff;
+}
+
+/* Active */
+.sidebar-link.active {
+    background: #f97316;
+    color: #fff;
+}
+
+/* Logout */
+.sidebar-link.logout {
+    margin-top: 30px;
+    color: #f87171;
+}
+
+.sidebar-link.logout:hover {
+    background: #7f1d1d;
+    color: #fff;
+}

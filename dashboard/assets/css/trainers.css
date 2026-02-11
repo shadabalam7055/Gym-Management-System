@@ -1,0 +1,27 @@
+
+
+/* Main content spacing */
+.main-content {
+  margin-left: 240px;
+  padding: 24px;
+  background: #f6f7fb;
+  min-height: 100vh;
+}
+
+/* Table tweaks */
+.table th,
+.table td {
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+/* Card style */
+.card {
+  border: none;
+  border-radius: 10px;
+}
+
+/* Small buttons */
+.btn-sm {
+  padding: 4px 8px;
+}

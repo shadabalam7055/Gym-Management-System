@@ -1,0 +1,53 @@
+.contact-hero {
+  min-height: 60vh;
+  padding-top: 100px;   /* 👈 यही main fix है */
+  background:
+    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)),
+    url('../img/contact-bg.jpg') center/cover no-repeat;
+}
+
+.contact-info {
+  background: #f8f9fa;
+}
+
+.info-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  transition: 0.3s;
+}
+
+.info-card i {
+  font-size: 30px;
+  color: #ff6f61;
+  margin-bottom: 15px;
+}
+
+.info-card h5 {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+}
+
+.contact-form input,
+.contact-form textarea {
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.contact-form .form-control,
+.contact-form .form-select {
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.contact-img {
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  max-height: 420px;
+  object-fit: cover;
+}

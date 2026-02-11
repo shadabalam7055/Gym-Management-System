@@ -1,0 +1,72 @@
+body {
+    background: #f5f6fa;
+    margin: 0;
+}
+
+.dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    margin-left: 240px; /* sidebar width ke hisab se */
+    padding: 25px;
+    width: 100%;
+}
+
+/* STAT CARDS */
+.stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.stat-card h3 {
+    color: #f97316;
+    font-weight: 700;
+}
+
+.stat-card p {
+    margin: 0;
+    color: #555;
+}
+
+/* ACTION CARDS */
+.action-card {
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.action-card:hover {
+    background: #f97316;
+    color: #fff;
+}
+
+/* ALERT CARDS */
+.alert-card {
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.alert-card.danger {
+    background: #ef4444;
+}
+
+.alert-card.warning {
+    background: #f59e0b;
+}
+
+.view-member {
+    text-decoration: none;
+    color: inherit;
+}

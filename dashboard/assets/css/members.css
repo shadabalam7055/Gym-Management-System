@@ -1,0 +1,36 @@
+/* Prevent horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+/* Dashboard layout safety */
+.dashboard-wrapper {
+  width: 100%;
+}
+
+
+/* ONLY MEMBERS PAGE TABLE */
+.main-content .table th,
+.main-content .table td {
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+/* Card look */
+.card {
+  border-radius: 8px;
+  border: none;
+}
+
+/* Buttons consistency */
+.btn-sm {
+  padding: 4px 8px;
+}
+
+.main-content {
+  margin-left: 240px;   /* SAME AS SIDEBAR WIDTH */
+  padding: 24px;
+  background: #f6f7fb;
+  min-height: 100vh;
+  overflow-x: hidden;
+}

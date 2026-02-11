@@ -1,0 +1,17 @@
+
+.main-content .table th,
+.main-content .table td {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Card style */
+.card {
+  border-radius: 8px;
+  border: none;
+}
+
+/* Button consistency */
+.btn-sm {
+  padding: 4px 10px;
+}
