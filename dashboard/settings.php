@@ -16,55 +16,81 @@ if (!isset($_SESSION['admin_id'])) {
 
 $admin_id = $_SESSION['admin_id'];
 
-// fetch current admin details
-$stmt = $conn->prepare("SELECT * FROM admin WHERE id=?");
-$stmt->execute([$admin_id]);
-$admin = $stmt->fetch(PDO::FETCH_ASSOC);
+// मैसेज दिखाने के लिए खाली वेरिएबल्स बना लिए हैं
+$profile_msg = $profile_err = "";
+$pwd_msg = $pwd_err = "";
+$add_msg = $add_err = "";
 
-/* ===== UPDATE PROFILE ===== */
+/* ===== PROFILE UPDATE ===== */
 if (isset($_POST['update_profile'])) {
+    $username = trim($_POST['name']); 
+    $email = trim($_POST['email']);
 
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-
-    $up = $conn->prepare("UPDATE admin SET name=?, email=? WHERE id=?");
-    $up->execute([$name, $email, $admin_id]);
-
-    echo "<script>alert('Profile updated successfully'); window.location='settings.php';</script>";
+    $up = $conn->prepare("UPDATE admin SET UserName=?, email=? WHERE id=?");
+    if ($up->execute([$username, $email, $admin_id])) {
+        $profile_msg = "Profile updated successfully!";
+    } else {
+        $profile_err = "Failed to update profile.";
+    }
 }
 
 /* ===== CHANGE PASSWORD ===== */
 if (isset($_POST['change_password'])) {
-
     $old = $_POST['old_password'];
     $new = $_POST['new_password'];
 
-    if ($old != $admin['password']) {
-        echo "<script>alert('Old password incorrect');</script>";
-    } else {
-        $up = $conn->prepare("UPDATE admin SET password=? WHERE id=?");
-        $up->execute([$new, $admin_id]);
+    // पासवर्ड चेक करने के लिए पहले करेंट पासवर्ड निकालें
+    $check_stmt = $conn->prepare("SELECT password FROM admin WHERE id=?");
+    $check_stmt->execute([$admin_id]);
+    $current_admin = $check_stmt->fetch(PDO::FETCH_ASSOC);
 
-        echo "<script>alert('Password changed successfully'); window.location='settings.php';</script>";
+    if (!password_verify($old, $current_admin['password'])) {
+        $pwd_err = "Old password incorrect!";
+    } else {
+        $new_hashed_password = password_hash($new, PASSWORD_DEFAULT);
+        
+        $up = $conn->prepare("UPDATE admin SET password=? WHERE id=?");
+        if ($up->execute([$new_hashed_password, $admin_id])) {
+            $pwd_msg = "Password changed successfully!";
+        } else {
+            $pwd_err = "Failed to change password.";
+        }
     }
 }
 
 /* ===== ADD NEW ADMIN ===== */
 if (isset($_POST['add_admin'])) {
-
-    $name = $_POST['new_name'];
-    $username = $_POST['new_username'];
-    $email = $_POST['new_email'];
+    $name = trim($_POST['new_name']); // अगर डेटाबेस में name का कॉलम है तो इसे भी इन्सर्ट क्वेरी में डाल सकते हैं
+    $username = trim($_POST['new_username']);
+    $email = trim($_POST['new_email']);
     $password = $_POST['new_password'];
 
-    $ins = $conn->prepare("
-        INSERT INTO admin (username, email, password)
-        VALUES (?,?,?)
-    ");
+    $check_stmt = $conn->prepare("SELECT id FROM admin WHERE UserName = ? OR email = ? LIMIT 1");
+    $check_stmt->execute([$username, $email]);
+    $existing_admin = $check_stmt->fetch(PDO::FETCH_ASSOC);
 
-    $ins->execute([$username, $email, $password]);
-    echo "<script>alert('New admin added successfully'); window.location='settings.php';</script>";
+    if ($existing_admin) {
+        $add_err = "Error: Username or Email already exists!";
+    } else {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $ins = $conn->prepare("
+            INSERT INTO admin (UserName, email, password)
+            VALUES (?,?,?)
+        ");
+
+        if ($ins->execute([$username, $email, $hashed_password])) {
+            $add_msg = "New admin added successfully!";
+        } else {
+            $add_err = "Failed to add new admin.";
+        }
+    }
 }
+
+// अपडेट के बाद ताज़ा डेटा निकालें ताकि फॉर्म में नया डेटा तुरंत दिखे
+$stmt = $conn->prepare("SELECT * FROM admin WHERE id=?");
+$stmt->execute([$admin_id]);
+$admin = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -91,7 +117,6 @@ if (isset($_POST['add_admin'])) {
 
 <div class="row">
 
-<!-- PROFILE UPDATE -->
 <div class="col-md-6">
 <div class="card mb-4">
 <div class="card-header">Profile Settings</div>
@@ -99,27 +124,32 @@ if (isset($_POST['add_admin'])) {
 <div class="card-body">
 <form method="post">
 
-<label>Name</label>
+<label>Username</label>
 <input type="text" class="form-control mb-3"
 name="name"
-value="<?php echo $admin['UserName']; ?>">
+value="<?php echo htmlspecialchars($admin['UserName']); ?>" required>
 
 <label>Email</label>
 <input type="email" class="form-control mb-3"
 name="email"
-value="<?php echo $admin['email']; ?>">
+value="<?php echo htmlspecialchars($admin['email']); ?>" required>
 
-<button class="btn btn-primary w-100"
-name="update_profile">
+<button class="btn btn-primary w-100" name="update_profile">
 Update Profile
 </button>
+
+<?php if($profile_msg): ?>
+    <div class="alert alert-success mt-3 mb-0 py-2"><?php echo $profile_msg; ?></div>
+<?php endif; ?>
+<?php if($profile_err): ?>
+    <div class="alert alert-danger mt-3 mb-0 py-2"><?php echo $profile_err; ?></div>
+<?php endif; ?>
 
 </form>
 </div>
 </div>
 </div>
 
-<!-- PASSWORD CHANGE -->
 <div class="col-md-6">
 <div class="card mb-4">
 <div class="card-header">Change Password</div>
@@ -129,16 +159,22 @@ Update Profile
 
 <label>Old Password</label>
 <input type="password" class="form-control mb-3"
-name="old_password">
+name="old_password" required>
 
 <label>New Password</label>
 <input type="password" class="form-control mb-3"
-name="new_password">
+name="new_password" required>
 
-<button class="btn btn-warning w-100"
-name="change_password">
+<button class="btn btn-warning w-100" name="change_password">
 Change Password
 </button>
+
+<?php if($pwd_msg): ?>
+    <div class="alert alert-success mt-3 mb-0 py-2"><?php echo $pwd_msg; ?></div>
+<?php endif; ?>
+<?php if($pwd_err): ?>
+    <div class="alert alert-danger mt-3 mb-0 py-2"><?php echo $pwd_err; ?></div>
+<?php endif; ?>
 
 </form>
 </div>
@@ -148,7 +184,6 @@ Change Password
 </div>
 
 
-<!-- ADD NEW ADMIN -->
 <div class="card">
 <div class="card-header">Add New Admin</div>
 
@@ -159,22 +194,22 @@ Change Password
 
 <div class="col-md-6 mb-3">
 <label>Name</label>
-<input type="text" class="form-control" name="new_name">
+<input type="text" class="form-control" name="new_name" required>
 </div>
 
 <div class="col-md-6 mb-3">
 <label>Username</label>
-<input type="text" class="form-control" name="new_username">
+<input type="text" class="form-control" name="new_username" required>
 </div>
 
 <div class="col-md-6 mb-3">
 <label>Email</label>
-<input type="email" class="form-control" name="new_email">
+<input type="email" class="form-control" name="new_email" required>
 </div>
 
 <div class="col-md-6 mb-3">
 <label>Password</label>
-<input type="password" class="form-control" name="new_password">
+<input type="password" class="form-control" name="new_password" required>
 </div>
 
 </div>
@@ -182,6 +217,13 @@ Change Password
 <button class="btn btn-success w-100" name="add_admin">
 Add Admin
 </button>
+
+<?php if($add_msg): ?>
+    <div class="alert alert-success mt-3 mb-0 py-2"><?php echo $add_msg; ?></div>
+<?php endif; ?>
+<?php if($add_err): ?>
+    <div class="alert alert-danger mt-3 mb-0 py-2"><?php echo $add_err; ?></div>
+<?php endif; ?>
 
 </form>
 </div>

@@ -20,21 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
 
+        // डेटाबेस से यूज़रनेम के आधार पर रिकॉर्ड निकालें
         $stmt = $conn->prepare("SELECT * FROM admin WHERE UserName = ? LIMIT 1");
         $stmt->execute([$username]);
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($admin && $admin['password'] === $password) {
+        // 👈 MAIN FIX: यहाँ password_verify() का इस्तेमाल किया गया है
+        if ($admin && password_verify($password, $admin['password'])) {
 
-    session_regenerate_id(true);
+            session_regenerate_id(true);
 
-    $_SESSION['admin_logged_in'] = true;
-    $_SESSION['admin_id'] = $admin['id'];        // 👈 MAIN FIX
-    $_SESSION['admin_username'] = $admin['UserName'];
+            $_SESSION['admin_logged_in'] = true;
+            $_SESSION['admin_id'] = $admin['id'];        
+            $_SESSION['admin_username'] = $admin['UserName'];
 
-    header("Location: dashboard/index.php");
-    exit;
-} else {
+            header("Location: dashboard/index.php");
+            exit;
+        } else {
             $errors['general'] = 'Invalid username or password';
         }
     }
@@ -48,13 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Admin Login | Alan Fitness Club</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
